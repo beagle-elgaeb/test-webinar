@@ -13,14 +13,33 @@ export interface TodoItem {
   done: boolean;
 }
 
+export type TodoItemFormData = Omit<TodoItem, "id" | "done">;
+
 interface TodoItemsState {
   todoItems: TodoItem[];
 }
 
-interface TodoItemsAction {
-  type: "loadState" | "add" | "delete" | "toggleDone" | "reorder";
-  data: any;
-}
+type TodoItemsAction =
+  | {
+      type: "loadState";
+      data: TodoItemsState;
+    }
+  | {
+      type: "add";
+      data: { todoItem: TodoItemFormData };
+    }
+  | {
+      type: "delete";
+      data: { id: string };
+    }
+  | {
+      type: "toggleDone";
+      data: { id: string };
+    }
+  | {
+      type: "reorder";
+      data: { startIndex: number; endIndex: number };
+    };
 
 const TodoItemsContext = createContext<
   (TodoItemsState & { dispatch: (action: TodoItemsAction) => void }) | null
@@ -69,7 +88,10 @@ export const useTodoItems = () => {
   return todoItemsContext;
 };
 
-function todoItemsReducer(state: TodoItemsState, action: TodoItemsAction) {
+function todoItemsReducer(
+  state: TodoItemsState,
+  action: TodoItemsAction
+): TodoItemsState {
   switch (action.type) {
     case "loadState": {
       return action.data;
