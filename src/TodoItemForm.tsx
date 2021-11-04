@@ -28,12 +28,7 @@ export default function TodoItemForm() {
         defaultValue=""
         rules={{ required: true }}
         render={({ field }) => (
-          <TextField
-            {...field}
-            label="TODO"
-            fullWidth={true}
-            className={classes.root}
-          />
+          <TextField {...field} label="TODO" fullWidth={true} className={classes.root} />
         )}
       />
       <Controller
@@ -50,12 +45,7 @@ export default function TodoItemForm() {
           />
         )}
       />
-      <Button
-        variant="contained"
-        color="primary"
-        type="submit"
-        disabled={!watch("title")}
-      >
+      <Button variant="contained" color="primary" type="submit" disabled={!watch("title")}>
         Add
       </Button>
     </form>

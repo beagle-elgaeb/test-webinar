@@ -44,10 +44,7 @@ export const TodoItemsList = function () {
   // });
   const sortedItems = todoItems;
 
-  function onDragEnd(result: {
-    source: { index: number };
-    destination?: { index: number };
-  }) {
+  function onDragEnd(result: { source: { index: number }; destination?: { index: number } }) {
     if (!result.destination) {
       return;
     }
@@ -68,15 +65,11 @@ export const TodoItemsList = function () {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="list">
-        {(provided) => (
-          <ul
-            className={classes.root}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
+        {provided => (
+          <ul className={classes.root} ref={provided.innerRef} {...provided.droppableProps}>
             {sortedItems.map((item, index) => (
               <Draggable draggableId={item.id} index={index} key={item.id}>
-                {(provided) => (
+                {provided => (
                   <div
                     ref={provided.innerRef}
                     {...(provided.draggableProps as any)}
@@ -114,7 +107,7 @@ export const TodoItemCard = function ({ item }: { item: TodoItem }) {
 
   const handleDelete = useCallback(
     () => dispatch({ type: "delete", data: { id: item.id } }),
-    [item.id, dispatch]
+    [item.id, dispatch],
   );
 
   const handleToggleDone = useCallback(
@@ -123,7 +116,7 @@ export const TodoItemCard = function ({ item }: { item: TodoItem }) {
         type: "toggleDone",
         data: { id: item.id },
       }),
-    [item.id, dispatch]
+    [item.id, dispatch],
   );
 
   return (
