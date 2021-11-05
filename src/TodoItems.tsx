@@ -28,23 +28,13 @@ const useTodoItemListStyles = makeStyles({
 });
 
 export const TodoItemsList = function () {
-  const { todoItems, dispatch } = useTodoItems();
+  const { todoItems, todoItemsDone, dispatch } = useTodoItems();
   const classes = useTodoItemListStyles();
 
-  // const sortedItems = todoItems.slice().sort((a, b) => {
-  //   if (a.done && !b.done) {
-  //     return 1;
-  //   }
-
-  //   if (!a.done && b.done) {
-  //     return -1;
-  //   }
-
-  //   return 0;
-  // });
-  const sortedItems = todoItems;
-
-  function onDragEnd(result: { source: { index: number }; destination?: { index: number } }) {
+  function onDragEnd(
+    result: { source: { index: number }; destination?: { index: number } },
+    done: boolean,
+  ) {
     if (!result.destination) {
       return;
     }
@@ -58,35 +48,63 @@ export const TodoItemsList = function () {
       data: {
         startIndex: result.source.index,
         endIndex: result.destination.index,
+        done: done,
       },
     });
   }
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="list">
-        {provided => (
-          <ul className={classes.root} ref={provided.innerRef} {...provided.droppableProps}>
-            {sortedItems.map((item, index) => (
-              <Draggable draggableId={item.id} index={index} key={item.id}>
-                {provided => (
-                  <div
-                    ref={provided.innerRef}
-                    {...(provided.draggableProps as any)}
-                    {...provided.dragHandleProps}
-                  >
-                    <motion.li transition={spring} layout={true} drag="y">
-                      <TodoItemCard item={item} />
-                    </motion.li>
-                  </div>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </ul>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <>
+      <DragDropContext onDragEnd={result => onDragEnd(result, false)}>
+        <Droppable droppableId="list">
+          {provided => (
+            <ul className={classes.root} ref={provided.innerRef} {...provided.droppableProps}>
+              {todoItems.map((item, index) => (
+                <Draggable draggableId={item.id} index={index} key={item.id}>
+                  {provided => (
+                    <div
+                      ref={provided.innerRef}
+                      {...(provided.draggableProps as any)}
+                      {...provided.dragHandleProps}
+                    >
+                      <motion.li transition={spring} layout={true} drag="y">
+                        <TodoItemCard item={item} done={false} />
+                      </motion.li>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </ul>
+          )}
+        </Droppable>
+      </DragDropContext>
+
+      <DragDropContext onDragEnd={result => onDragEnd(result, true)}>
+        <Droppable droppableId="list">
+          {provided => (
+            <ul className={classes.root} ref={provided.innerRef} {...provided.droppableProps}>
+              {todoItemsDone.map((item, index) => (
+                <Draggable draggableId={item.id} index={index} key={item.id}>
+                  {provided => (
+                    <div
+                      ref={provided.innerRef}
+                      {...(provided.draggableProps as any)}
+                      {...provided.dragHandleProps}
+                    >
+                      <motion.li transition={spring} layout={true} drag="y">
+                        <TodoItemCard item={item} done={true} />
+                      </motion.li>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </ul>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </>
   );
 };
 
@@ -101,28 +119,28 @@ const useTodoItemCardStyles = makeStyles({
   },
 });
 
-export const TodoItemCard = function ({ item }: { item: TodoItem }) {
+export const TodoItemCard = function ({ item, done }: { item: TodoItem; done: boolean }) {
   const classes = useTodoItemCardStyles();
   const { dispatch } = useTodoItems();
 
   const handleDelete = useCallback(
-    () => dispatch({ type: "delete", data: { id: item.id } }),
-    [item.id, dispatch],
+    () => dispatch({ type: "delete", data: { id: item.id, done: done } }),
+    [item.id, done, dispatch],
   );
 
   const handleToggleDone = useCallback(
     () =>
       dispatch({
         type: "toggleDone",
-        data: { id: item.id },
+        data: { id: item.id, done: done },
       }),
-    [item.id, dispatch],
+    [item.id, done, dispatch],
   );
 
   return (
     <Card
       className={classnames(classes.root, {
-        [classes.doneRoot]: item.done,
+        [classes.doneRoot]: done,
       })}
     >
       <CardHeader
@@ -135,7 +153,7 @@ export const TodoItemCard = function ({ item }: { item: TodoItem }) {
           <FormControlLabel
             control={
               <Checkbox
-                checked={item.done}
+                checked={done}
                 onChange={handleToggleDone}
                 name={`checked-${item.id}`}
                 color="primary"

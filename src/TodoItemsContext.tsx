@@ -1,16 +1,17 @@
 import { createContext, ReactNode, useContext, useEffect, useReducer } from "react";
+import produce from "immer";
 
 export interface TodoItem {
   id: string;
   title: string;
   details?: string;
-  done: boolean;
 }
 
 export type TodoItemFormData = Omit<TodoItem, "id" | "done">;
 
 interface TodoItemsState {
   todoItems: TodoItem[];
+  todoItemsDone: TodoItem[];
 }
 
 type TodoItemsAction =
@@ -24,22 +25,22 @@ type TodoItemsAction =
     }
   | {
       type: "delete";
-      data: { id: string };
+      data: { id: string; done: boolean };
     }
   | {
       type: "toggleDone";
-      data: { id: string };
+      data: { id: string; done: boolean };
     }
   | {
       type: "reorder";
-      data: { startIndex: number; endIndex: number };
+      data: { startIndex: number; endIndex: number; done: boolean };
     };
 
 const TodoItemsContext = createContext<
   (TodoItemsState & { dispatch: (action: TodoItemsAction) => void }) | null
 >(null);
 
-const defaultState = { todoItems: [] };
+const defaultState = { todoItems: [], todoItemsDone: [] };
 const localStorageKey = "todoListState";
 
 export const TodoItemsContextProvider = ({ children }: { children?: ReactNode }) => {
@@ -74,47 +75,59 @@ export const useTodoItems = () => {
   return todoItemsContext;
 };
 
-function todoItemsReducer(state: TodoItemsState, action: TodoItemsAction): TodoItemsState {
+const todoItemsReducer = produce((draft: TodoItemsState, action: TodoItemsAction) => {
   switch (action.type) {
     case "loadState": {
       return action.data;
     }
     case "add":
-      return {
-        ...state,
-        todoItems: [{ id: generateId(), done: false, ...action.data.todoItem }, ...state.todoItems],
-      };
-    case "delete":
-      return {
-        ...state,
-        todoItems: state.todoItems.filter(({ id }) => id !== action.data.id),
-      };
-    case "toggleDone":
-      const itemIndex = state.todoItems.findIndex(({ id }) => id === action.data.id);
-      const item = state.todoItems[itemIndex];
+      draft.todoItems.unshift({
+        id: generateId(),
+        title: action.data.todoItem.title,
+        details: action.data.todoItem.details,
+      });
+      break;
+    case "delete": {
+      const listName = action.data.done ? "todoItemsDone" : "todoItems";
 
-      return {
-        ...state,
-        todoItems: [
-          ...state.todoItems.slice(0, itemIndex),
-          { ...item, done: !item.done },
-          ...state.todoItems.slice(itemIndex + 1),
-        ],
-      };
-    case "reorder":
-      const result = [...state.todoItems];
-      const [removed] = result.splice(action.data.startIndex, 1);
-      result.splice(action.data.endIndex, 0, removed);
+      const list = draft[listName];
 
-      return {
-        ...state,
-        todoItems: result,
-      };
+      const index = list.findIndex(({ id }) => id === action.data.id);
+      if (index !== -1) {
+        list.splice(index, 1);
+      }
+      break;
+    }
+    case "toggleDone": {
+      const listName = action.data.done ? "todoItemsDone" : "todoItems";
+      const listNameAnother = action.data.done ? "todoItems" : "todoItemsDone";
+
+      const list = draft[listName];
+      const listAnother = draft[listNameAnother];
+
+      const index = list.findIndex(({ id }) => id === action.data.id);
+      if (index !== -1) {
+        const item = list[index];
+        list.splice(index, 1);
+        listAnother.splice(1, 0, item);
+      }
+
+      break;
+    }
+    case "reorder": {
+      const listName = action.data.done ? "todoItemsDone" : "todoItems";
+
+      const list = draft[listName];
+
+      const [removed] = list.splice(action.data.startIndex, 1);
+      list.splice(action.data.endIndex, 0, removed);
+      break;
+    }
 
     default:
       throw new Error();
   }
-}
+});
 
 function generateId() {
   return `${Date.now().toString(36)}-${Math.floor(Math.random() * 1e16).toString(36)}`;
