@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/test-webinar/static/css/main.b67bd49d.chunk.css",
+    "main.js": "/test-webinar/static/js/main.3cfbeb82.chunk.js",
+    "main.js.map": "/test-webinar/static/js/main.3cfbeb82.chunk.js.map",
+    "runtime-main.js": "/test-webinar/static/js/runtime-main.f467de80.js",
+    "runtime-main.js.map": "/test-webinar/static/js/runtime-main.f467de80.js.map",
+    "static/js/2.224a9667.chunk.js": "/test-webinar/static/js/2.224a9667.chunk.js",
+    "static/js/2.224a9667.chunk.js.map": "/test-webinar/static/js/2.224a9667.chunk.js.map",
+    "static/js/3.0924223e.chunk.js": "/test-webinar/static/js/3.0924223e.chunk.js",
+    "static/js/3.0924223e.chunk.js.map": "/test-webinar/static/js/3.0924223e.chunk.js.map",
+    "index.html": "/test-webinar/index.html",
+    "static/css/main.b67bd49d.chunk.css.map": "/test-webinar/static/css/main.b67bd49d.chunk.css.map",
+    "static/js/2.224a9667.chunk.js.LICENSE.txt": "/test-webinar/static/js/2.224a9667.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.f467de80.js",
+    "static/js/2.224a9667.chunk.js",
+    "static/css/main.b67bd49d.chunk.css",
+    "static/js/main.3cfbeb82.chunk.js"
+  ]
+}
