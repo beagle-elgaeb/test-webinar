@@ -8,6 +8,8 @@ _[Ссылка на приложение](https://beagle-elgaeb.github.io/test-w
   <a href="https://www.typescriptlang.org/"><img src="readme/icon-ts.svg" alt="TS"></a>
     <img src="readme/icon-whitespace-5px.svg"/>
   <a href="https://ru.reactjs.org/"><img src="readme/icon-react.svg" alt="React"></a>
+    <img src="readme/icon-whitespace-5px.svg"/>
+  <a href="https://github.com/atlassian/react-beautiful-dnd"><img src="readme/icon-react-beautiful-dnd.svg" alt="React-beautiful-dnd"></a>
 </p>
 
 ## Задание
